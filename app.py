@@ -25,7 +25,7 @@ def get_embedding(text, model="text-embedding-ada-002"):
 def tokenize(text):
     # use tiktoken package
     # https://platform.openai.com/tokenizer
-    enc = tk.encoding_for_model("gpt-3.5")
+    enc = tk.encoding_for_model("gpt-3.5-turbo")
     tokens = enc.encode(text)
     return tokens
 
@@ -60,10 +60,11 @@ with st.sidebar:
     
     st.write('  ') 
     st.markdown("""---""")
-    openai_api_key = st.text_input("# OpenAI API Key", key="chatbot_api_key", type="password")
-    col1, col2 = st.columns([1,5], gap="medium")
-    with col2:
-        "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
+    if not openai_api_key:
+        openai_api_key = st.text_input("# OpenAI API Key", key="chatbot_api_key", type="password")
+        col1, col2 = st.columns([1,5], gap="medium")
+        with col2:
+            "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
 
     # File Upload
     upload = st.file_uploader("Upload a document")
@@ -93,6 +94,7 @@ with st.sidebar:
                 # get rid of & characters
                 document = document.replace("&", "and")
 
+        st.write('  ') 
         st.subheader('Document Embeddings')
 
         tokens = tokenize(document)
@@ -101,7 +103,6 @@ with st.sidebar:
 
         token_chunks = chunk_tokens(tokens)
         n_token_chunks = len(token_chunks)
-        st.write("token chunks: ", n_token_chunks)
 
         word_chunks = [detokenize(chunk) for chunk in token_chunks]
         n_word_chunks = len(word_chunks)
@@ -110,6 +111,7 @@ with st.sidebar:
         doc_embeddings = embed_chunks(word_chunks)
         st.write("embeddings: ", np.array(doc_embeddings).shape)
 
+        st.write('  ') 
         st.sidebar.subheader('Document')
         st.sidebar.write(document)
 

@@ -18,6 +18,7 @@ This code uses the following libraries:
 - `numpy`: for creating arrays
 - `pandas`: for creating dataframes
 
+&nbsp;
 ## Usage
 
 To run this code, you need an OpenAI API Key. You can get an OpenAI API key by creating an account on the OpenAI website. Copy it to your clipboard and paste it into the app once its running. All the dependencies are handled automatically from the requirements.txt file
@@ -30,6 +31,7 @@ streamlit run https://github.com/BrianLesko/text-similarity-search/blob/main/app
 
 This will start the Streamlit server, and you can access the chatbot by opening a web browser and navigating to `http://localhost:8501`.
 
+&nbsp;
 ## How it Works
 
 The chatbot works as follows:
@@ -41,6 +43,7 @@ The chatbot works as follows:
 
 The chat history is saved in the `st.session_state` dictionary, which is a dictionary that persists across Streamlit sessions.
 
+&nbsp;
 ## Repository Structure
 ```
 doc-chat/
@@ -53,8 +56,6 @@ doc-chat/
 ├── requirements.txt # the python packages needed to run locally
 └── .gitignore # includes the api key file and the local virtual environment
 ```
-
-&nbsp;
 
 &nbsp;
 

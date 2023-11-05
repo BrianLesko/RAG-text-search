@@ -12,9 +12,8 @@ def about():
             st.write(""" 
             Hey it's Brian,
                      
-            Here you can upload and ask questions about a document.
-                    
-            import your document below.
+            In this code you can upload and ask questions about a .txt file.
+
             """)
 
         col1, col2, col3, col4, col5, col6 = st.columns([1.1,1,1,1,1,1.5], gap="medium")
