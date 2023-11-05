@@ -1,11 +1,7 @@
 streamlit 
 openai
 pypdf
-langchain 
-# document loading
 sentence-transformers
-chromadb
 scikit-learn
-scipy 
 tiktoken
 docx2txt

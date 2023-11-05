@@ -8,6 +8,43 @@ This git repository hosts a user interface for a chat-app, with integrated text 
 
 &nbsp;
 
+## Dependencies
+
+This code uses the following libraries:
+- `streamlit`: for building the user interface.
+- `openai`: for generating responses to user questions.
+- `tiktoken`: for tokenizing text
+- `scikit-learn`: for finding the relevant text chunks based on a user's question.
+- `numpy`: for creating arrays
+- `pandas`: for creating dataframes
+
+To install these libraries, use the following command:
+```
+pip install streamlit openai numpy pandas tiktoken scikit-learn
+```
+
+## Usage
+
+To run this code, first create a python file in the app directory with the line `openai_api_key = "Your API Key"`. You can get an OpenAI API key by creating an account on the OpenAI website.
+
+Then, run the following command:
+```
+streamlit run app.py
+```
+
+This will start the Streamlit server, and you can access the chatbot by opening a web browser and navigating to `http://localhost:8501`.
+
+## How it Works
+
+The chatbot works as follows:
+1. The user enters a question in the input field.
+2. The chatbot retrieves relevant text chunks based on the user's question using scikit-learn cosine similarity search.
+3. The chatbot adds the user's question to the retrieved text chunks to create an augmented query.
+4. The chatbot generates a response to the augmented query using OpenAI's GPT-3.5 (Chat GPT) language model.
+5. The chatbot displays the response to the user, along with the chat history.
+
+The chat history is saved in the `st.session_state` dictionary, which is a dictionary that persists across Streamlit sessions.
+
 ## Repository Structure
 ```
 doc-chat/
@@ -23,7 +60,7 @@ doc-chat/
 
 &nbsp;
 
-## Run this demo locally
+## Run locally
 ```
 pip install --upgrade streamlit
 streamlit run 

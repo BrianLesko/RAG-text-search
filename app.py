@@ -25,7 +25,7 @@ def get_embedding(text, model="text-embedding-ada-002"):
 def tokenize(text):
     # use tiktoken package
     # https://platform.openai.com/tokenizer
-    enc = tk.encoding_for_model("gpt-4")
+    enc = tk.encoding_for_model("gpt-3.5")
     tokens = enc.encode(text)
     return tokens
 
