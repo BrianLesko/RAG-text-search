@@ -18,18 +18,14 @@ This code uses the following libraries:
 - `numpy`: for creating arrays
 - `pandas`: for creating dataframes
 
-To install these libraries, use the following command:
-```
-pip install streamlit openai numpy pandas tiktoken scikit-learn
-```
-
 ## Usage
 
-To run this code, first create a python file in the app directory with the line `openai_api_key = "Your API Key"`. You can get an OpenAI API key by creating an account on the OpenAI website.
+To run this code, you need an OpenAI API Key. You can get an OpenAI API key by creating an account on the OpenAI website. Copy it to your clipboard and paste it into the app once its running. All the dependencies are handled automatically from the requirements.txt file
 
 Then, run the following command:
 ```
-streamlit run app.py
+pip install --upgrade streamlit
+streamlit run https://github.com/BrianLesko/text-similarity-search/blob/main/app.py
 ```
 
 This will start the Streamlit server, and you can access the chatbot by opening a web browser and navigating to `http://localhost:8501`.
@@ -59,12 +55,6 @@ doc-chat/
 ```
 
 &nbsp;
-
-## Run locally
-```
-pip install --upgrade streamlit
-streamlit run 
-```
 
 &nbsp;
 
