@@ -1,6 +1,6 @@
 
 # Text Similarity Search
-This git repository hosts a user interface for a chat-app, with integrated text similarity search for querying a document. Think of it as an upgrded Cmd+F search. It's written in [Pure Python](). Created for Learning Purposes.
+This code implements a chat-app with text similarity search for querying a document. Think of it as an upgraded Cmd+F search. It's written in [Pure Python](https://github.com/BrianLesko/text-similarity-search/blob/main/app.py). Created for Learning Purposes.
 
 &nbsp;
 
