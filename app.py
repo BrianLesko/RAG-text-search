@@ -1,7 +1,7 @@
 ###############################################################################################
 # Brian Lesko
 # 2023-10-24
-# hosts a user interface for a chat-app, with integrated text similarity search 
+# implements a chat-app, with text a similarity search engine
 # for querying a document. Think of it as an upgrded Cmd+F search. 
 # It's written in [Pure Python](). Created for Learning Purposes.
 ###############################################################################################
