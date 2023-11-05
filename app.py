@@ -1,6 +1,6 @@
 ###############################################################################################
 # Brian Lesko
-# 2023-10-24
+# 2023-11-05
 # implements a chat-app, with text a similarity search engine
 # for querying a document. Think of it as an upgrded Cmd+F search. 
 # It's written in [Pure Python](). Created for Learning Purposes.
