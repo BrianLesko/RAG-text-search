@@ -2,6 +2,7 @@
 # Text Similarity Search
 This code implements a chat-app with text similarity search for querying a document. Think of it as an upgraded Cmd+F search. It's written in [Pure Python](https://github.com/BrianLesko/text-similarity-search/blob/main/app.py). Created for Learning Purposes.
 
+
 &nbsp;
 
 <div align="center"><img src="docs/preview.png" width="800"></div>
@@ -19,11 +20,12 @@ This code uses the following libraries:
 - `pandas`: for creating dataframes
 
 &nbsp;
+
 ## Usage
 
 To run this code, you need an OpenAI API Key. You can get an OpenAI API key by creating an account on the OpenAI website. Copy it to your clipboard and paste it into the app once its running. All the dependencies are handled automatically from the requirements.txt file
 
-Then, run the following command:
+Run the following command:
 ```
 pip install --upgrade streamlit
 streamlit run https://github.com/BrianLesko/text-similarity-search/blob/main/app.py
@@ -32,6 +34,7 @@ streamlit run https://github.com/BrianLesko/text-similarity-search/blob/main/app
 This will start the Streamlit server, and you can access the chatbot by opening a web browser and navigating to `http://localhost:8501`.
 
 &nbsp;
+
 ## How it Works
 
 The chatbot works as follows:

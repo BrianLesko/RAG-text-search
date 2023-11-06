@@ -85,6 +85,7 @@ def get_text(upload):
             document = document.replace("  ", " ")
             document = document.encode('ascii', 'ignore').decode()
             document = document.replace("&", "and")
+    return document
 
 def display_existing_messages():
     if "messages" not in st.session_state:
@@ -92,7 +93,7 @@ def display_existing_messages():
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
 
-def get_relevant_contexts(word_chunks, query_embedding, doc_embeddings, n):
+def get_relevant_contexts(text_chunks, query_embedding, doc_embeddings, n):
     # for each row of doc_embeddings, calculate the cosine similarity between the prompt embedding and the document embedding
     similarities = []
     for doc_embedding in doc_embeddings:
@@ -104,7 +105,7 @@ def get_relevant_contexts(word_chunks, query_embedding, doc_embeddings, n):
     # Combine the top n chunks into a single string called "Context"
     context = ""
     for idx in idx_top_n_scores:
-        context += word_chunks[idx] + " "
+        context += text_chunks[idx] + " "
 
 def augment_query(contexts, query):
     augmented_query = (
@@ -113,7 +114,7 @@ def augment_query(contexts, query):
     )
     return augmented_query
 
-def generate_response(augmented_query):
+def generate_response(augmented_query,query):
     st.session_state.messages.append({"role": "user", "content": augmented_query})
     response = openai.ChatCompletion.create(model="gpt-4", messages=st.session_state.messages)
     # delete the last message from the session state, so that only the prompt and response are displayed on the next run: no context
@@ -123,11 +124,11 @@ def generate_response(augmented_query):
     st.session_state.messages.append(msg)
     return msg
 
-def print_embedding_info(tokens,word_chunks,doc_embeddings,document):
+def print_embedding_info(tokens,text_chunks,doc_embeddings,document):
     st.write('  ') 
     st.subheader('Document Embeddings')
     st.write("tokens: ", np.array(tokens).size)
-    st.write("word chunks: ", len(word_chunks))
+    st.write("word chunks: ", len(text_chunks))
     st.write("embeddings: ", np.array(doc_embeddings).shape)
     st.write('  ') 
     st.subheader('Document')
@@ -139,25 +140,25 @@ def main():
 
     with st.sidebar:
         about()
-        openai_api_key = input_api_key()
+        if not openai.api_key: openai.api_key = input_api_key()
         upload = st.file_uploader("Upload a document")
     if upload:
         document = get_text(upload)
         tokens = tokenize(document)
         token_chunks = chunk_tokens(tokens)
-        word_chunks = [detokenize(chunk) for chunk in token_chunks]
-        doc_embeddings = embed_chunks(word_chunks)
+        text_chunks = [detokenize(chunk) for chunk in token_chunks]
+        doc_embeddings = embed_chunks(text_chunks)
         with st.sidebar:
-            print_embedding_info(tokens,word_chunks,doc_embeddings,document)
+            print_embedding_info(tokens,text_chunks,doc_embeddings,document)
         display_existing_messages()
         query = st.chat_input("Write a message")
         if query:
             st.chat_message("user").write(query)
             query_embedding = get_embedding(query)
             n = 2
-            contexts = get_relevant_contexts(word_chunks,query_embedding, doc_embeddings, n)
+            contexts = get_relevant_contexts(text_chunks,query_embedding, doc_embeddings, n)
             augmented_query = augment_query(contexts, query)
-            response = generate_response(augmented_query)
+            response = generate_response(augmented_query,query)
             st.chat_message("assistant").write(response.content)
             with st.expander("Context"):
                 st.write(contexts)
