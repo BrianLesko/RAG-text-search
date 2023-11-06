@@ -9,7 +9,7 @@ import numpy as np
 import streamlit as st
 import tiktoken as tk
 import openai
-import docx2txt
+#import docx2txt
 from sklearn.metrics.pairwise import cosine_similarity
 from about import about
 from api_key import openai_api_key

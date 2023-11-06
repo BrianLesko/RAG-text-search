@@ -12,7 +12,7 @@ def about():
             st.write(""" 
             Hey it's Brian,
                      
-            In this code you can upload and ask questions about a .txt file.
+            In this code you can ask a question about any .txt file upload and have chatGPT answer.
 
             """)
 
