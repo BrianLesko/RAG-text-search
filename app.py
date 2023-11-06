@@ -1,10 +1,8 @@
-###############################################################################################
-# Brian Lesko
-# 2023-11-05
-# implements a chat-app, with text a similarity search engine
-# for querying a document. Think of it as an upgrded Cmd+F search. 
-# It's written in [Pure Python](). Created for Learning Purposes.
-###############################################################################################
+###################################################################################################
+#  Brian Lesko               2023-11-05
+#  This code implements a chat-app, with a text similarity search engine for querying a document. 
+#  Think of it as an upgrded Cmd+F search. Written in pure Python & created for learning purposes.
+###################################################################################################
 
 import pandas as pd
 import numpy as np
@@ -94,7 +92,7 @@ def display_existing_messages():
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
 
-def get_relevant_contexts(query_embedding, doc_embeddings, n):
+def get_relevant_contexts(word_chunks, query_embedding, doc_embeddings, n):
     # for each row of doc_embeddings, calculate the cosine similarity between the prompt embedding and the document embedding
     similarities = []
     for doc_embedding in doc_embeddings:
@@ -125,7 +123,7 @@ def generate_response(augmented_query):
     st.session_state.messages.append(msg)
     return msg
 
-def print_embedding_info():
+def print_embedding_info(tokens,word_chunks,doc_embeddings,document):
     st.write('  ') 
     st.subheader('Document Embeddings')
     st.write("tokens: ", np.array(tokens).size)
@@ -150,13 +148,14 @@ def main():
         word_chunks = [detokenize(chunk) for chunk in token_chunks]
         doc_embeddings = embed_chunks(word_chunks)
         with st.sidebar:
-            print_embedding_info()
+            print_embedding_info(tokens,word_chunks,doc_embeddings,document)
         display_existing_messages()
         query = st.chat_input("Write a message")
         if query:
             st.chat_message("user").write(query)
             query_embedding = get_embedding(query)
-            contexts = get_relevant_contexts(query_embedding, doc_embeddings, n)
+            n = 2
+            contexts = get_relevant_contexts(word_chunks,query_embedding, doc_embeddings, n)
             augmented_query = augment_query(contexts, query)
             response = generate_response(augmented_query)
             st.chat_message("assistant").write(response.content)
