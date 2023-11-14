@@ -100,16 +100,17 @@ def get_relevant_contexts(text_chunks, query_embedding, doc_embeddings, n):
         similarities.append(cosine_similarity([query_embedding], [doc_embedding])[0][0])
         
     # the indicies of the top n most similar chunks
-    idx_top_n_scores = np.argsort(similarities)[-n:][::-1]
+    idx_sorted_scores = np.argsort(similarities)[::-1]
 
     # Combine the top n chunks into a single string called "Context"
     context = ""
-    for idx in idx_top_n_scores:
-        context += text_chunks[idx] + " "
+    for idx in idx_sorted_scores[:n]:
+        context += text_chunks[idx] + "\n"
+    return context
 
 def augment_query(contexts, query):
     augmented_query = (
-        f"###Search Results: \n{contexts} #End of Search Results\n\n-----\n\n {query}" + """you need to be clear and concise, sometime funny.
+        f"###Search Results: \n{contexts} #End of Search Results\n\n-----\n\n {query}" + """ In your answer please be clear and concise, sometime funny.
         If you need to make an assumption you must say so."""
     )
     return augmented_query
