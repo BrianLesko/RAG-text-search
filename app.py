@@ -9,9 +9,9 @@ import numpy as np
 import streamlit as st
 import tiktoken as tk
 import openai
-#import docx2txt
 from sklearn.metrics.pairwise import cosine_similarity
-from about import about
+from customize_gui import about
+from customize_gui import hide_streamlit_header_footer
 from api_key import openai_api_key
 openai.api_key = openai_api_key
 
@@ -48,17 +48,6 @@ def embed_chunks(chunks):
     for chunk in chunks:
         embeddings.append(get_embedding(chunk))
     return embeddings
-
-def hide_streamlit_header_footer():
-    hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            #root > div:nth-child(1) > div > div > div > div > section > div {padding-top: 0rem;}
-            </style>
-            """
-    st.markdown(hide_st_style, unsafe_allow_html=True)
 
 def input_api_key():
     st.write('  ') 
