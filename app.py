@@ -1,7 +1,7 @@
 ###################################################################################################
-#  Brian Lesko               2023-11-05
-#  This code implements a chat-app, with a text similarity search engine for querying a document. 
-#  Think of it as an upgrded Cmd+F search. Written in pure Python & created for learning purposes.
+#  Brian Lesko               2023-11-14
+#  This code implements an embedding shema that is used to compare the similarity of textual data.
+#  Think of it as an upgraded Cmd+F search. Written in pure Python & created for learning purposes.
 ###################################################################################################
 
 import pandas as pd
@@ -10,10 +10,11 @@ import streamlit as st
 import tiktoken as tk
 import openai
 from sklearn.metrics.pairwise import cosine_similarity
-from customize_gui import about
-from customize_gui import hide_streamlit_header_footer
+from customize_gui import gui
 from api_key import openai_api_key
 openai.api_key = openai_api_key
+
+gui = gui()
 
 def get_embedding(text, model="text-embedding-ada-002"):
    text = text.replace("\n", " ")
@@ -21,16 +22,12 @@ def get_embedding(text, model="text-embedding-ada-002"):
 
 @st.cache_resource
 def tokenize(text):
-    # use tiktoken package
-    # https://platform.openai.com/tokenizer
     enc = tk.encoding_for_model("gpt-3.5-turbo")
     tokens = enc.encode(text)
     return tokens
 
 @st.cache_resource
 def chunk_tokens(tokens, chunk_length=40, chunk_overlap=10):
-    # turn the document into chunks with some overlap
-    # split the document into chunks
     chunks = []
     for i in range(0, len(tokens), chunk_length - chunk_overlap):
         chunks.append(tokens[i:i + chunk_length])
@@ -49,53 +46,11 @@ def embed_chunks(chunks):
         embeddings.append(get_embedding(chunk))
     return embeddings
 
-def input_api_key():
-    st.write('  ') 
-    st.markdown("""---""")
-    if not openai_api_key:
-        openai_api_key = st.text_input("# OpenAI API Key", key="chatbot_api_key", type="password")
-        col1, col2 = st.columns([1,5], gap="medium")
-        with col2:
-            "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-    return openai_api_key
-
 def get_text(upload):
     # if the upload is a .txt file
     if upload.name.endswith(".txt"):
         document = upload.read().decode("utf-8")
-
-    # This is so much worse than a .txt file, uses machine vision 
-    if upload.name.endswith(".docx") or upload.name.endswith(".doc") or upload.name.endswith(".pdf") or upload.name.endswith(".png") or upload.name.endswith(".jpg"):
-        #!pip install docx2txt
-        #!pip install python-magic
-        with st.spinner('Extracting Text...'):
-            document = docx2txt.process(upload)
-            document = document.replace("\n", " ")
-            document = document.replace("  ", " ")
-            document = document.encode('ascii', 'ignore').decode()
-            document = document.replace("&", "and")
     return document
-
-def display_existing_messages():
-    if "messages" not in st.session_state:
-        st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
-
-def get_relevant_contexts(text_chunks, query_embedding, doc_embeddings, n):
-    # for each row of doc_embeddings, calculate the cosine similarity between the prompt embedding and the document embedding
-    similarities = []
-    for doc_embedding in doc_embeddings:
-        similarities.append(cosine_similarity([query_embedding], [doc_embedding])[0][0])
-        
-    # the indicies of the top n most similar chunks
-    idx_sorted_scores = np.argsort(similarities)[::-1]
-
-    # Combine the top n chunks into a single string called "Context"
-    context = ""
-    for idx in idx_sorted_scores[:n]:
-        context += text_chunks[idx] + "\n"
-    return context
 
 def augment_query(contexts, query):
     augmented_query = (
@@ -114,39 +69,53 @@ def generate_response(augmented_query,query):
     st.session_state.messages.append(msg)
     return msg
 
-def print_embedding_info(tokens,text_chunks,doc_embeddings,document):
-    st.write('  ') 
-    st.subheader('Document Embeddings')
-    st.write("tokens: ", np.array(tokens).size)
-    st.write("word chunks: ", len(text_chunks))
-    st.write("embeddings: ", np.array(doc_embeddings).shape)
-    st.write('  ') 
-    st.subheader('Document')
-    st.write(document)
+class document:
+    def __init__(self, name, text):
+        self.name = name
+        self.text = text
+        self.tokens = tokenize(text)
+        self.token_chunks = chunk_tokens(self.tokens, chunk_length=50, chunk_overlap=10)
+        self.text_chunks = [detokenize(chunk) for chunk in self.token_chunks]
+        self.chunk_embeddings = embed_chunks(self.text_chunks)
+        self.embedding = get_embedding(self.text)
+        self.df = pd.DataFrame({
+            "name": [self.name], 
+            "text": [self.text], 
+            "embedding": [self.embedding], 
+            "tokens": [self.tokens], 
+            "token_chunks": [self.token_chunks], 
+            "text_chunks": [self.text_chunks], 
+            "chunk_embeddings": [self.chunk_embeddings]
+            })
+
+    def similarity_search(self, query, n=3):
+        query_embedding = get_embedding(query)
+        similarities = []
+        for chunk_embedding in self.chunk_embeddings:
+            similarities.append(cosine_similarity([query_embedding], [chunk_embedding])[0][0])
+        # the indicies of the top n most similar chunks
+        idx_sorted_scores = np.argsort(similarities)[::-1]
+        context = ""
+        for idx in idx_sorted_scores[:n]:
+            context += self.text_chunks[idx] + "\n"
+        return context
 
 def main():
-    st.set_page_config(page_title="Brian Lesko", page_icon="🤖", layout="wide")
-    hide_streamlit_header_footer()
-
+    gui.clean_format()
     with st.sidebar:
-        about()
-        if not openai.api_key: openai.api_key = input_api_key()
+        gui.about(text="This code implements a text embedding similarity search. Think of it as an upgraded Cmd+F.")
+        if not openai.api_key: openai.api_key = gui.input_api_key()
         upload = st.file_uploader("Upload a document")
     if upload:
-        document = get_text(upload)
-        tokens = tokenize(document)
-        token_chunks = chunk_tokens(tokens)
-        text_chunks = [detokenize(chunk) for chunk in token_chunks]
-        doc_embeddings = embed_chunks(text_chunks)
+        doc = document(upload.name, get_text(upload)) # document class defined above
         with st.sidebar:
-            print_embedding_info(tokens,text_chunks,doc_embeddings,document)
-        display_existing_messages()
+            st.subheader("Document")
+            st.write(doc.text)
+        gui.display_existing_messages()
         query = st.chat_input("Write a message")
         if query:
             st.chat_message("user").write(query)
-            query_embedding = get_embedding(query)
-            n = 2
-            contexts = get_relevant_contexts(text_chunks,query_embedding, doc_embeddings, n)
+            contexts = doc.similarity_search(query, n=2)
             augmented_query = augment_query(contexts, query)
             response = generate_response(augmented_query,query)
             st.chat_message("assistant").write(response.content)
