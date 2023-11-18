@@ -30,6 +30,7 @@ class gui():
                 "." #st.write("[![LinkedIn](https://raw.githubusercontent.com/BrianLesko/BrianLesko/f7be693250033b9d28c2224c9c1042bb6859bfe9/.socials/svg-335095-blue/yt-logo-blue.svg)](https://www.linkedin.com/in/brianlesko/)")
             with col6: # BLOG Visual Study Code
                 "." #"[![VSC]()](https://www.visualstudycode.com/)"
+            st.markdown("""---""")
 
     def clean_format(self):
         hide_st_style = """
